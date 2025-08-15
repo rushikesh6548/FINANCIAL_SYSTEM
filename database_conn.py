@@ -7,11 +7,54 @@ import datetime
 class Database:
     def __init__(self):
         ## should be connecting to the database ! 
-        conn = pyodbc.connect(
-        "Driver={SQL Server};"
-        "Server=192.168.10.12,1433;"  # or "DESKTOP-GQFUIC4"
-        "Database=BankApp;"
-        "Trusted_Connection=yes;"
-        )
+        try : 
+            conn = pyodbc.connect(
+            "Driver={SQL Server};"
+            "Server=192.168.10.12,1433;"  # or "DESKTOP-GQFUIC4"
+            "Database=BankApp;"
+            "Trusted_Connection=yes;"
+            )
+            self.conn = conn
+            self.cursor = conn.cursor()
+        except pyodbc.Error as e:
+            print(f"Error connecting to database: {e}")
+            self.conn = None
+            self.cursor = None
 
-    
+
+    def create_user(self,user ):
+        ## WE will be creating the user inside our database! 
+        query = 'INSERT INTO users (fname , lname , pwd,BALANCE) VALUES (?,?,?,0)'
+        try:    
+            ## check if user already exists or not ! 
+            user_exists = self.conn.execute("SELECT 1 from users where fname = ? and lname = ?", (user.fname,user.lname)).fetchall()
+            
+            if len(user_exists) == 0 :
+                
+                self.cursor.execute(query, (user.fname,user.lname,user.pwd))
+                self.cursor.commit()
+                self.conn.close()
+                return 1
+
+            else : 
+                print("USERNAME ALREADY TAKEN ! KINDLY ENTER A NEW USERNAME! WE WILL START THE USER CREATION PROCESS AGAIN ! ")
+                self.conn.close()
+                return 0
+
+        except pyodbc.Error as e:
+            print(e)
+
+
+    def check_correct_user(self,user  ):
+        try:
+            user_correct= self.conn.execute("SELECT 1 from users where fname = ? and lname = ? and pwd = ?",(user.fname , user.lname,user.pwd )).fetchall()
+            print(user_correct)
+            if len(user_correct) == 0 :
+                return 0 
+            else:
+                return 1 
+
+        except pyodbc.Error as e:
+            print(e)
+
+        

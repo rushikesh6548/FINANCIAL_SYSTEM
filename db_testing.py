@@ -10,10 +10,12 @@ def get_connection():
     return conn
 
 
-if __name__ == "__main__":
-    print(f'{__name__}')
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sys.databases;")
-    for row in cursor.fetchall():
-        print(row[0])
+conn = get_connection()
+cursor = conn.cursor()
+# cursor.execute("SELECT name FROM sys.databases;")
+# for row in cursor.fetchall():
+#     print(row[0])
+
+
+res = cursor.execute('select * from users ').fetchall()
+print(res)
