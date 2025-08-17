@@ -33,12 +33,12 @@ class Database:
                 
                 self.cursor.execute(query, (user.fname,user.lname,user.pwd))
                 self.cursor.commit()
-                self.conn.close()
+                
                 return 1
 
             else : 
                 print("USERNAME ALREADY TAKEN ! KINDLY ENTER A NEW USERNAME! WE WILL START THE USER CREATION PROCESS AGAIN ! ")
-                self.conn.close()
+                
                 return 0
 
         except pyodbc.Error as e:
@@ -57,4 +57,21 @@ class Database:
         except pyodbc.Error as e:
             print(e)
 
+    def get_user_balance(self,user):
+        try:
+            balance = self.conn.execute("SELECT BALANCE FROM USERS WHERE FNAME =  ? and LNAME = ? ", (user.fname, user.lname)).fetchone()
+            return balance
+        
+        except pyodbc.Error as e:
+            print(e)    
+        
+    def depo_money_db(self,amt,user):
+        try:
+            self.conn.execute("UPDATE USERS SET BALANCE = BALANCE + ? WHERE fname = ? and lname = ? ", (amt,user.fname , user.lname))
+            self.conn.commit()
+            
+            return 1 
+        except pyodbc.Error as e:
+            print(e)
+            return 0
         

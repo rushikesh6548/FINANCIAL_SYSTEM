@@ -30,14 +30,60 @@ class Menu:
         elif x == 2 :
             self.login()
 
-    def after_login(self):
+    def after_login(self,user):
         ## 
         user_inp = str(input("WHAT BANKING FEATURES DO YOU WANT TO AVAIL?\n"
-                             "TYPE 1 TO CHECK YOUR BALANCE"))
+                             "TYPE 1 TO CHECK YOUR BALANCE\n"
+                             "TYPE 2 TO DEPOSIT MONEY\n"))
         
-        
+        if user_inp == '1':
+            bal = self.db.get_user_balance(user=user)[0]
+            print(f'HI! {user.fname}, YOUR BALANCE CURRENTLY IS : {bal}\n')
+            us_inp = str(input("WHAT WOULD YOU LIKE TO DO NOW ?\n"
+            "PRESS 1 TO GO TO LOGOUT AND GO TO THE MAIN MENU PRESS 2 TO GO TO THE BANKING FEATURES FOR YOU MENU\n"))
+            
+            if us_inp == '1':
+                self.start()
+            elif us_inp == '2':
+                
+                self.after_login(user=user)
 
-    
+
+        if user_inp == '2':
+            self.deposit_money(user=user) 
+            
+            
+            
+
+            
+            
+        
+        
+    def deposit_money(self,user):
+        ## depositing money code
+        while True:
+            try:
+                use_inp = input("ENTER THE AMOUNT YOU WANT TO DEPOSIT IN INR!")
+                amt = int(use_inp)
+                if amt <= 0:
+                    print("ENTER A VALUE GREATER THAN ZERO")
+                    continue
+                else:
+                    ## connect to db and insert the value 
+                    print(f"DEPOSITING AMOUNT {amt} INR!")
+                    if self.db.depo_money_db(user=user,amt=amt) == 0:
+                        print("SOMETHING WENT WRONG , REDIRECTING YOU TO THE MAIN MENU")
+                        self.start()
+                    else:
+                        print(f"MONEY DEPOSITED SUCCESSFULLY!, YOUR CURRENT BALANCE NOW IS {self.db.get_user_balance(user = user )[0]} \n")
+                        print("REDIRECTING YOU TO THE BANKING FEARUES PORTAL!")
+                        self.after_login(user=user )
+
+                    break
+            except ValueError:
+                print("ENTER A VALID NUMBER ONLY ")
+            
+
 
 
     def create_new_user(self):
@@ -66,13 +112,15 @@ class Menu:
         result = self.db.check_correct_user(user=user)
         if result == 1 :
             print("WELCOME HUMAN ! LOGGED IN SUCCESSFULLY ! ")
-            self.after_login()
+            self.after_login(user)
         else :
             user_response = str(input("USERNAME OR PASSWORD DOES NOT MATCH ! SELECT 1 TO TRY AND LOGIN AGAIN OR SELECT 2 TO CREATE NEW ACCOUNT"))
-            if user_response == 1 :
-                self.after_login()
+            if user_response == '1' :
+                self.login()
             else :
                 self.create_new_user()
+
+
 
 
 
