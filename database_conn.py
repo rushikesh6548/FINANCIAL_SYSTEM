@@ -75,3 +75,20 @@ class Database:
             print(e)
             return 0
         
+
+    def get_user_all_details(self,user):
+        try:
+            all_details = self.conn.execute("SELECT * FROM Users where fname = ? and lname = ?",(user.fname , user.lname)).fetchall()
+            return all_details
+        except pyodbc.Error as e:
+            print(e)
+
+
+    def update_user_details(self, user, age, income,obligation):
+        try:
+            self.conn.execute("UPDATE Users SET age = ?, income = ? , obligations = ? WHERE fname = ? and lname = ?", 
+                              (age, income,obligation , user.fname, user.lname))
+            self.conn.commit()
+            print("User details updated successfully.")
+        except pyodbc.Error as e:
+            print(f"Error updating user details: {e}")

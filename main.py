@@ -34,7 +34,8 @@ class Menu:
         ## 
         user_inp = str(input("WHAT BANKING FEATURES DO YOU WANT TO AVAIL?\n"
                              "TYPE 1 TO CHECK YOUR BALANCE\n"
-                             "TYPE 2 TO DEPOSIT MONEY\n"))
+                             "TYPE 2 TO DEPOSIT MONEY\n"
+                             "TYPE 3 TO GET A LOAN"))
         
         if user_inp == '1':
             bal = self.db.get_user_balance(user=user)[0]
@@ -48,17 +49,50 @@ class Menu:
                 
                 self.after_login(user=user)
 
+        if user_inp == '3':
+            ## calling the function to get a loan :
+            self.get_loan(user=user) 
+
 
         if user_inp == '2':
             self.deposit_money(user=user) 
             
             
-            
+    def get_loan(self,user):
+        ## to get a loan first we check if user has provided his age and income 
+        # Then we check the amount he is eligible for
+        
+        #1.checking if user has age and income 
 
-            
-            
+        record = self.db.get_user_all_details(user=user)
+        ## column_names:
         
+        age = record[0][6]
+        income = record[0][5]
+        obligation = record[0][7]
+
+        if age is None or income is None:
+            print("PLEASE PROVIDE YOUR AGE AND INCOME AND OBLIGATION DETAILS TO GET A LOAN!")
+            age = int(input("PLEASE ENTER YOUR AGE : "))
+            income = int(input("PLEASE ENTER YOUR ANNUAL INCOME : "))
+            obligation = int(input("PLEASE ENTER YOUR MONTHLY OBLIGATION : "))
+            ## updating the user details in the database 
+            self.db.update_user_details(user=user, age=age, income=income, obligation=obligation)
         
+        else:
+            print(f"Redirecting you to the Loan processing system!\n")
+        ## 2. checking the amount user is eligible for
+        if age < 18 or age >=61:
+            print("SORRY! YOU ARE NOT ELIGIBLE FOR A LOAN AS YOU ARE UNDER 18 YEARS OF AGE! REDIRECTING YOU TO THE LOGIN MENU")
+            self.after_login(user=user) 
+        elif income/12 < obligation*2.5:
+            print("SORRY! YOU ARE NOT ELIGIBLE FOR A LOAN AS YOUR MONTHLY INCOME IS LESS THAN 2.5 TIMES YOUR OBLIGATION! REDIRECTING YOU TO THE LOGIN MENU")
+            self.after_login(user=user)
+        else:
+            print(f"YOU ARE ELIGIBLE FOR A LOAN! YOUR MONTHLY INCOME IS {income/12} AND YOUR OBLIGATION IS {obligation} \n")
+            ## now we can proceed to get a loan 
+            print("WE ARE HERE CURRENTLY ! ")
+
     def deposit_money(self,user):
         ## depositing money code
         while True:

@@ -11,6 +11,9 @@ class User:
         self.lname = last_name
         self.pwd = password
         self.bal = 0 
+        self.income = None
+        self.age = None
+        self.obligation = None
 
     def __str__(self):
         return f'USERNAME : {self.fname + self.lname}'
